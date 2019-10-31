@@ -244,7 +244,7 @@ class TestResidentKey(object):
         """
         Test maximum capacity of resident keys.
         """
-        RK_CAPACITY = 16
+        RK_CAPACITY = 100
         device.reset()
         req = FidoRequest(options={"rk": True})
 
@@ -261,7 +261,7 @@ class TestResidentKey(object):
         assert e.value.code == CtapError.ERR.KEY_STORE_FULL
 
         for i, reg in enumerate(reversed(regs)):
-            if i not in (0, 1, 7, 14, 15):
+            if i not in (0, 1, 50, 98, 99):
                 continue
             req = FidoRequest(req, options=None, on_keepalive=DeviceSelectCredential(i + 1))
             res = device.sendGA(*req.toGA())
