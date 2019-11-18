@@ -44,7 +44,7 @@ class HidOverUDP(fido2._pyu2f.base.HidDevice):
         addr, port = path.split(":")
         port = int(port)
         self.token = (addr, port)
-        self.sock.settimeout(1.0)
+        self.sock.settimeout(2.0)
 
     def GetInReportDataLength(self):
         return 64
