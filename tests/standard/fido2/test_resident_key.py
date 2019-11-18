@@ -20,6 +20,8 @@ def SetPINRes(request, device, info):
             pin_auth = hmac_sha256(pin_token, req.cdh)[:16]
 
             req = FidoRequest(req, pin_protocol=1, pin_auth=pin_auth)
+        else:
+            pytest.skip("PIN not supported")
 
     res = device.sendMC(*req.toMC())
     setattr(res, "request", req)
@@ -43,6 +45,8 @@ def GA_RK_Res(device, MC_RK_Res):
 
 
 class TestResidentKey(object):
+    pytestmark = pytest.mark.random_order(disabled=True)
+
     def test_resident_key(self, MC_RK_Res, info):
         pass
 
@@ -261,7 +265,7 @@ class TestResidentKey(object):
         assert e.value.code == CtapError.ERR.KEY_STORE_FULL
 
         for i, reg in enumerate(reversed(regs)):
-            if i not in (0, 1, 50, 98, 99):
+            if i not in (0, 1, RK_CAPACITY/2, RK_CAPACITY - 2, RK_CAPACITY - 1):
                 continue
             req = FidoRequest(req, options=None, on_keepalive=DeviceSelectCredential(i + 1))
             res = device.sendGA(*req.toGA())

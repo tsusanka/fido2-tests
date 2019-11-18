@@ -93,7 +93,7 @@ class TestHID(object):
 
     def test_ping_abort_from_different_cid(self, device, check_timeouts=False):
         oldcid = device.cid()
-        newcid = "\x11\x22\x33\x44"
+        newcid = bytes([oldcid[0] ^ 1]) + oldcid[1:]
         device.send_raw("\x81\x10\x00")
         device.send_raw("\x00")
         device.send_raw("\x01")
@@ -143,7 +143,7 @@ class TestHID(object):
         t1 = time.time() * 1000
         device.send_data(CTAPHID.INIT, "\x11\x22\x33\x44\x55\x66\x77\x88")
         oldcid = device.cid()
-        newcid = "\x11\x22\x33\x44"
+        newcid = bytes([oldcid[0] ^ 1]) + oldcid[1:]
         device.send_raw("\x81\x04\x00")
         device.set_cid(newcid)
         device.send_raw("\x81\x04\x00")
