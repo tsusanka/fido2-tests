@@ -25,7 +25,7 @@ def load_client():
         pin=None,
         passphrase_protection=False,
         label="test",
-        language="english",
+        language="en-US",
     )
     client.clear_session()
 
