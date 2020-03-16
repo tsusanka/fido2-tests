@@ -6,7 +6,7 @@ from binascii import hexlify
 
 import pytest
 from fido2.ctap import CtapError
-from fido2.hid import CTAPHID
+from fido2.hid import CAPABILITY, CTAPHID
 
 @pytest.mark.skipif(
     '--nfc' in sys.argv,
@@ -43,7 +43,8 @@ class TestHID(object):
         assert r == pingdata
 
     def test_wink(self, device):
-        r = device.send_data(CTAPHID.WINK, "")
+        if device.dev.capabilities & CAPABILITY.WINK:
+            r = device.send_data(CTAPHID.WINK, "")
 
     def test_cbor_no_payload(self, device):
         with pytest.raises(CtapError) as e:
