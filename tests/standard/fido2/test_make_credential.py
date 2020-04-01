@@ -38,6 +38,12 @@ class TestMakeCredential(object):
         resp = device.sendMC(*req.toMC())
         assert resp.auth_data.credential_data.public_key[3] == EdDSA.ALGORITHM
 
+    def test_basic_attestation_rp(self, device, MCRes):
+        # Make credential for an RP that requires basic attestation.
+        req = FidoRequest(MCRes, rp={"id": "login.microsoft.com"})
+        resp = device.sendMC(*req.toMC())
+        assert "x5c" in resp.att_statement
+
     def test_missing_cdh(self, device, MCRes):
         req = FidoRequest(MCRes, cdh=None)
 
