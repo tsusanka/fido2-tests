@@ -1,4 +1,5 @@
-import pytest
+import pytest, sys
+from fido2.cose import EdDSA
 from fido2.ctap import CtapError
 from fido2.ctap2 import ES256, AttestedCredentialData, PinProtocolV1
 from fido2.utils import hmac_sha256, sha256
@@ -15,6 +16,27 @@ class TestMakeCredential(object):
 
     def test_authdata_length(self, MCRes):
         assert len(MCRes.auth_data) >= 77
+
+    def test_multiple_key_params_es256(self, device, MCRes):
+        key_params = [
+            {"type": "public-key", "alg": ES256.ALGORITHM},
+            {"type": "public-key", "alg": EdDSA.ALGORITHM},
+        ]
+
+        req = FidoRequest(MCRes, key_params=key_params)
+        resp = device.sendMC(*req.toMC())
+        assert resp.auth_data.credential_data.public_key[3] == ES256.ALGORITHM
+
+    @pytest.mark.skipif('trezor' not in sys.argv, reason="Only Trezor supports EdDSA.")
+    def test_multiple_key_params_eddsa(self, device, MCRes):
+        key_params = [
+            {"type": "public-key", "alg": EdDSA.ALGORITHM},
+            {"type": "public-key", "alg": ES256.ALGORITHM},
+        ]
+
+        req = FidoRequest(MCRes, key_params=key_params)
+        resp = device.sendMC(*req.toMC())
+        assert resp.auth_data.credential_data.public_key[3] == EdDSA.ALGORITHM
 
     def test_missing_cdh(self, device, MCRes):
         req = FidoRequest(MCRes, cdh=None)
