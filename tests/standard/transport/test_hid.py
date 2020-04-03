@@ -8,6 +8,8 @@ import pytest
 from fido2.ctap import CtapError
 from fido2.hid import CAPABILITY, CTAPHID
 
+check_timeouts = 'trezor' in sys.argv
+
 @pytest.mark.skipif(
     '--nfc' in sys.argv,
     reason="Wrong transport"
@@ -26,10 +28,10 @@ class TestHID(object):
 
         assert r == pingdata
 
-    def test_init(self, device, check_timeouts=False):
+    def test_init(self, device):
         if check_timeouts:
             with pytest.raises(socket.timeout):
-                cmd, resp = self.recv_raw()
+                cmd, resp = device.recv_raw()
 
         payload = b"\x11\x11\x11\x11\x11\x11\x11\x11"
         r = device.send_data(CTAPHID.INIT, payload)
@@ -92,7 +94,7 @@ class TestHID(object):
         device.send_raw("\x01")
         device.send_data(CTAPHID.INIT, "\x11\x22\x33\x44\x55\x66\x77\x88")
 
-    def test_ping_abort_from_different_cid(self, device, check_timeouts=False):
+    def test_ping_abort_from_different_cid(self, device):
         oldcid = device.cid()
         newcid = bytes([oldcid[0] ^ 1]) + oldcid[1:]
         device.send_raw("\x81\x10\x00")
@@ -124,7 +126,7 @@ class TestHID(object):
         assert r[0] == CtapError.ERR.TIMEOUT
         assert delt < 1000 and delt > 400
 
-    def test_not_cont(self, device, check_timeouts=False):
+    def test_not_cont(self, device):
         device.send_data(CTAPHID.INIT, "\x11\x22\x33\x44\x55\x66\x77\x88")
         device.send_raw("\x81\x04\x00")
         device.send_raw("\x00")
