@@ -1,4 +1,5 @@
 import pytest
+import sys
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from fido2.ctap import CtapError
@@ -192,6 +193,7 @@ class TestHmacSecret(object):
             device.sendGA(*req.toGA())
         assert e.value.code == CtapError.ERR.INVALID_LENGTH
 
+    @pytest.mark.skipif('trezor' in sys.argv, reason="Trezor does not support get_next_assertion() because it has a display.")
     @pytest.mark.parametrize("salts", [(salt1,), (salt1, salt2)])
     def test_get_next_assertion_has_extension(self, device, MCHmacSecret, cipher, sharedSecret, salts, fixed_users):
         """ Check that get_next_assertion properly returns extension information for multiple accounts. """
@@ -237,7 +239,7 @@ class TestHmacSecret(object):
             verify(x, y, req.cdh)
 
 
-
+@pytest.mark.skipif('trezor' in sys.argv, reason="ClientPin is not supported on Trezor.")
 class TestHmacSecretUV(object):
     def test_hmac_secret_different_with_uv(self, device, MCHmacSecret, cipher, sharedSecret):
         salts = [salt1]
