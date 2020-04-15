@@ -8,17 +8,22 @@ from trezorlib.transport import enumerate_devices
 
 
 def load_client():
+    print("load_client")
     devices = enumerate_devices()
     for device in devices:
         try:
+            print("client set")
             client = TrezorClientDebugLink(device)
             break
         except Exception:
+            print("Error 1")
             pass
     else:
         raise RuntimeError("No debuggable device found")
 
+    print("wipe")
     wipe_device(client)
+    print("debug link load device")
     debuglink.load_device_by_mnemonic(
         client,
         mnemonic=" ".join(["all"] * 12),
@@ -27,8 +32,10 @@ def load_client():
         label="test",
         language="en-US",
     )
+    print("clear session")
     client.clear_session()
 
+    print("open")
     client.open()
     return client
 
