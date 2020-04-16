@@ -6,8 +6,10 @@ from trezorlib.debuglink import TrezorClientDebugLink
 from trezorlib.device import wipe as wipe_device
 from trezorlib.transport import enumerate_devices
 
+import time
 
 def load_client():
+    time.sleep(3)
     print("load_client")
     devices = enumerate_devices()
     for device in devices:
