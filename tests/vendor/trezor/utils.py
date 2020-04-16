@@ -18,15 +18,6 @@ def load_client():
     else:
         raise RuntimeError("No debuggable device found")
 
-    wipe_device(client)
-    debuglink.load_device_by_mnemonic(
-        client,
-        mnemonic=" ".join(["all"] * 12),
-        pin=None,
-        passphrase_protection=False,
-        label="test",
-        language="en-US",
-    )
     client.clear_session()
 
     client.open()
